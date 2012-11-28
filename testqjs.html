@@ -50,10 +50,19 @@
             SIZES['Common'] = {'ratio' : 0.65};
 
             function traverseFiles() {
+                // collect all the promises 
+                // of the traversed files undergoing calculateRatio
+                var promises = []; 
+                var to_go = pages.length;
                 for (var i=0, l=pages.length; i<l; i++) {
-                    getSizeSettingsFromPage(pages[i], calculateRatio);   
+                    getSizeSettingsFromPage(pages[i], calculateRatio).then(function(value){
+                           to_go--;
+                           if(to_go == 0){
+                               checkWhenReady();
+                           }
+                    });   
                 }
-                checkWhenReady(); // this does NOT work.
+                //Q.all(promises).then(function(value){ checkWhenReady() });
             }
 
             function getSizeSettingsFromPage(file, whenReady) {
@@ -93,7 +102,7 @@
                 }
 
                 pageSizes.add(filename, object);
-                checkWhenReady(); // this works but it is not ideal. I prefer to call this method AFTER all the `pages` have undergone calculateRatio
+                
             }
 
             function checkWhenReady() {
