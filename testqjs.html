@@ -55,13 +55,19 @@
                 var promises = []; 
                 
                 for (var i=0, l=pages.length; i<l; i++) {
-                    promises[i] = getSizeSettingsFromPage(pages[i], calculateRatio);
+                    promises.push(
+                        getSizeSettingsFromPage(pages[i], calculateRatio)
+                    );
                 }
                 // this returns 0 
-                Q.all(promises).then(function(value){ checkWhenReady(); });
+                // *** Call checkWhenReady after all promises have been resolved
+                Q.all(promises).then(checkWhenReady);
+                
             }
 
             function getSizeSettingsFromPage(file, whenReady) {
+                // *** Create a Deferred
+                var deferred = Q.defer();
                 reader = new FileReader();
                 reader.onload = function(evt) {
                     var image = new Image();
@@ -72,10 +78,14 @@
                         if (whenReady) {
                             whenReady(width, height, filename);
                         }
+                        // *** Resolve the Deferred
+                        deferred.resolve();
                     };
                     image.src = evt.target.result; 
                 };
                 reader.readAsDataURL(file);
+                // *** Return a Promise
+                return deferred.promise;
             }
 
             function calculateRatio(width, height, filename) {
@@ -98,7 +108,6 @@
                 }
 
                 pageSizes.add(filename, object);
-                
             }
 
             function checkWhenReady() {
