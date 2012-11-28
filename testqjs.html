@@ -93,7 +93,7 @@
                 }
 
                 pageSizes.add(filename, object);
-                
+                checkWhenReady(); // this works but it is not ideal. I prefer to call this method AFTER all the `pages` have undergone calculateRatio
             }
 
             function checkWhenReady() {
@@ -105,7 +105,9 @@
                 pageareaInnerWrap = document.getElementById("pagesarea-inner-wrap");
 
                 pageareaInnerWrap.addEventListener("drop", function (evt) { 
-                    pages.convertFrom(evt.dataTransfer.files);
+                    pages.convertFrom(evt.dataTransfer.files); 
+                    // after the above code, pages will now contain all the 
+                    // files dropped into the div#pagesarea-inner-wrap
                     traverseFiles();
                 
                     evt.preventDefault();
